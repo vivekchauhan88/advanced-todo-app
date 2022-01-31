@@ -10,8 +10,8 @@ function App() {
 	const [assignee, setAssignee] = useState('');
 	const [storyPoints, setStoryPoints] = useState('');
 	const [task, setTask] = useState({});
-	// const [i, setI] = useState(0);
-	// const [column, setColumn] = useState('todo');
+	const [index, setIndex] = useState('');
+	const [column, setColumn] = useState('');
 	const [tasks, setTasks] = useState([
 		{
 			id: 1,
@@ -29,6 +29,14 @@ function App() {
 			assignee: 'Vivek',
 			storyPoints: '2h',
 		},
+		{
+			id: 3,
+			taskName: 'Pet cows',
+			status: 'todo',
+			priority: 'P2',
+			assignee: 'Vivek',
+			storyPoints: '2h',
+		},
 	]);
 	const [todo, setTodo] = useState([]);
 	const [inProgress, setInProgress] = useState([]);
@@ -42,21 +50,53 @@ function App() {
 		let temp = tasks.filter((task) => {
 			return task.status === 'todo';
 		});
-		setTodo(...todo, temp);
+		setTodo([...todo, ...temp]);
 		temp = tasks.filter((task) => {
 			return task.status === 'inProgress';
 		});
-		setInProgress(...inProgress, temp);
+		setInProgress([...inProgress, ...temp]);
 		temp = tasks.filter((task) => {
 			return task.status === 'complete';
 		});
-		setComplete(...complete, temp);
+		setComplete([...complete, ...temp]);
 	};
 	const getIndexFromId = (id) => {
 		for (let i = 0; i < tasks.length; i++) {
 			if (tasks[i].id === id) {
 				return i;
 			}
+		}
+	};
+	const addTaskToList = (temp) => {
+		switch (status) {
+			case 'todo':
+				setTodo([...todo, temp]);
+				break;
+			case 'inProgress':
+				setInProgress([...inProgress, temp]);
+				break;
+			case 'complete':
+				setComplete([...complete, temp]);
+				break;
+		}
+	};
+	const removeTaskFromList = (column, index) => {
+		switch (column) {
+			case 'todo':
+				setTodo([...todo.slice(0, index), ...todo.slice(index + 1)]);
+				break;
+			case 'inProgress':
+				setInProgress([
+					...inProgress.slice(0, index),
+					...inProgress.slice(index + 1),
+				]);
+				break;
+			case 'complete':
+				setComplete([
+					...complete.slice(0, index),
+					...complete.slice(index + 1),
+				]);
+				break;
 		}
 	};
 	const createTask = () => {
@@ -84,17 +124,7 @@ function App() {
 			storyPoints: storyPoints,
 		};
 		setTasks([...tasks, temp]);
-		switch (status) {
-			case 'todo':
-				setTodo([...todo, temp]);
-				break;
-			case 'inProgress':
-				setInProgress([...inProgress, temp]);
-				break;
-			case 'complete':
-				setComplete([...complete, temp]);
-				break;
-		}
+		addTaskToList(temp);
 		emptyCreateModal();
 		setShowCreateModal(false);
 	};
@@ -103,23 +133,7 @@ function App() {
 		if (!temp) {
 			return;
 		}
-		switch (column) {
-			case 'todo':
-				setTodo([...todo.slice(0, i), ...todo.slice(i + 1)]);
-				break;
-			case 'inProgress':
-				setInProgress([
-					...inProgress.slice(0, i),
-					...inProgress.slice(i + 1),
-				]);
-				break;
-			case 'complete':
-				setComplete([
-					...complete.slice(0, i),
-					...complete.slice(i + 1),
-				]);
-				break;
-		}
+		removeTaskFromList(column, i);
 		let index = getIndexFromId(id);
 		tasks.splice(index, 1);
 	};
@@ -144,37 +158,10 @@ function App() {
 		task.storyPoints = storyPoints;
 		task.status = status;
 		task.priority = priority;
-		console.log(task);
-		// segregateTasks();
-		// switch (column) {
-		// 	case 'todo':
-		// 		setTodo([...todo.slice(0, i), ...todo.slice(i + 1)]);
-		// 		break;
-		// 	case 'inProgress':
-		// 		setInProgress([
-		// 			...inProgress.slice(0, i),
-		// 			...inProgress.slice(i + 1),
-		// 		]);
-		// 		break;
-		// 	case 'complete':
-		// 		setComplete([
-		// 			...complete.slice(0, i),
-		// 			...complete.slice(i + 1),
-		// 		]);
-		// 		break;
-		// }
-		// switch (status) {
-		// 	case 'todo':
-		// 		setTodo([...todo, task]);
-		// 		break;
-		// 	case 'inProgress':
-		// 		setInProgress([...inProgress, task]);
-		// 		break;
-		// 	case 'complete':
-		// 		setComplete([...complete, task]);
-		// 		break;
-		// }
-		console.log('edited');
+		if (column !== status) {
+			removeTaskFromList(column, index);
+			addTaskToList(task);
+		}
 		setShowEditModal(false);
 	};
 	const fillEditModal = (i, column, task) => {
@@ -185,8 +172,8 @@ function App() {
 		setStatus(task.status);
 		setPriority(task.priority);
 		setTask(task);
-		// setI(i);
-		// setColumn(column);
+		setIndex(i);
+		setColumn(column);
 	};
 	const emptyCreateModal = () => {
 		setTaskName('');
