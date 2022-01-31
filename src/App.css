@@ -2,12 +2,17 @@
 	padding: 75px 100px 100px 200px;
 }
 
-.addTask {
+.setWidth {
 	width: 200px;
 }
 
 .addPadding {
 	padding: 8px;
+}
+
+.center {
+	/* margin-left: 430px; */
+	text-align: center;
 }
 
 .innerContainer {
@@ -34,6 +39,7 @@
 .task {
 	background-color: white;
 	padding: 12px;
+	border-radius: 5px;
 }
 
 .icons {
@@ -43,4 +49,32 @@
 .icon {
 	cursor: pointer;
 	transform: scale(1.5);
+}
+
+.modal {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-content {
+	background-color: #fff;
+}
+
+.modal-header,
+.modal-footer {
+	padding: 10px;
+}
+
+.modal-title {
+	margin: 0;
+}
+
+.modal-body {
+	padding: 10px;
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #eee;
 }
