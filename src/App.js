@@ -12,54 +12,46 @@ function App() {
 	const [task, setTask] = useState({});
 	const [index, setIndex] = useState('');
 	const [column, setColumn] = useState('');
-	const [tasks, setTasks] = useState([
-		{
-			id: 1,
-			taskName: 'Feed cows',
-			status: 'todo',
-			priority: 'P0',
-			assignee: 'Vivek',
-			storyPoints: '3h',
-		},
-		{
-			id: 2,
-			taskName: 'Walk cows',
-			status: 'inProgress',
-			priority: 'P1',
-			assignee: 'Vivek',
-			storyPoints: '2h',
-		},
-		{
-			id: 3,
-			taskName: 'Pet cows',
-			status: 'todo',
-			priority: 'P2',
-			assignee: 'Vivek',
-			storyPoints: '2h',
-		},
-	]);
+	const [tasks, setTasks] = useState(
+		localStorage.getItem('tasks')
+			? JSON.parse(localStorage.getItem('tasks'))
+			: []
+	);
 	const [todo, setTodo] = useState([]);
 	const [inProgress, setInProgress] = useState([]);
 	const [complete, setComplete] = useState([]);
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
+	const [searchString, setSearchString] = useState('');
+
 	useEffect(() => {
-		segregateTasks();
+		segregateTasks(tasks);
 	}, []);
-	const segregateTasks = () => {
+
+	useEffect(() => {
+		const filteredTasks = tasks.filter((task) => {
+			return task.taskName
+				.toLowerCase()
+				.includes(searchString.toLowerCase());
+		});
+		segregateTasks(filteredTasks);
+	}, [searchString]);
+
+	const segregateTasks = (tasks) => {
 		let temp = tasks.filter((task) => {
 			return task.status === 'todo';
 		});
-		setTodo([...todo, ...temp]);
+		setTodo([...temp]);
 		temp = tasks.filter((task) => {
 			return task.status === 'inProgress';
 		});
-		setInProgress([...inProgress, ...temp]);
+		setInProgress([...temp]);
 		temp = tasks.filter((task) => {
 			return task.status === 'complete';
 		});
-		setComplete([...complete, ...temp]);
+		setComplete([...temp]);
 	};
+
 	const getIndexFromId = (id) => {
 		for (let i = 0; i < tasks.length; i++) {
 			if (tasks[i].id === id) {
@@ -67,6 +59,7 @@ function App() {
 			}
 		}
 	};
+
 	const addTaskToList = (temp) => {
 		switch (status) {
 			case 'todo':
@@ -80,6 +73,7 @@ function App() {
 				break;
 		}
 	};
+
 	const removeTaskFromList = (column, index) => {
 		switch (column) {
 			case 'todo':
@@ -99,6 +93,7 @@ function App() {
 				break;
 		}
 	};
+
 	const createTask = () => {
 		if (taskName.trim().length === 0) {
 			alert('Task Name field cannot be empty');
@@ -123,11 +118,14 @@ function App() {
 			assignee: assignee,
 			storyPoints: storyPoints,
 		};
-		setTasks([...tasks, temp]);
+		// setTasks([...tasks, temp]);
+		tasks.push(temp);
+		localStorage.setItem('tasks', JSON.stringify(tasks));
 		addTaskToList(temp);
 		emptyCreateModal();
 		setShowCreateModal(false);
 	};
+
 	const removeTask = (i, column, id) => {
 		const temp = window.confirm('Do you really want to delete this task?');
 		if (!temp) {
@@ -136,7 +134,9 @@ function App() {
 		removeTaskFromList(column, i);
 		let index = getIndexFromId(id);
 		tasks.splice(index, 1);
+		localStorage.setItem('tasks', JSON.stringify(tasks));
 	};
+
 	const editTask = () => {
 		if (taskName.trim().length === 0) {
 			alert('Task Name field cannot be empty');
@@ -158,12 +158,14 @@ function App() {
 		task.storyPoints = storyPoints;
 		task.status = status;
 		task.priority = priority;
+		localStorage.setItem('tasks', JSON.stringify(tasks));
 		if (column !== status) {
 			removeTaskFromList(column, index);
 			addTaskToList(task);
 		}
 		setShowEditModal(false);
 	};
+
 	const fillEditModal = (i, column, task) => {
 		setShowEditModal(true);
 		setTaskName(task.taskName);
@@ -175,6 +177,7 @@ function App() {
 		setIndex(i);
 		setColumn(column);
 	};
+
 	const emptyCreateModal = () => {
 		setTaskName('');
 		setAssignee('');
@@ -194,6 +197,13 @@ function App() {
 			>
 				Create Task
 			</button>
+			&nbsp;&nbsp;
+			<input
+				className='setWidth addPadding'
+				placeholder='Filter Tasks'
+				onChange={(e) => setSearchString(e.target.value)}
+				value={searchString}
+			/>
 			<br />
 			<br />
 			<div className='innerContainer'>
@@ -294,7 +304,7 @@ function App() {
 				</select>
 				<br />
 				<br />
-				Assigne: &nbsp;
+				Assignee: &nbsp;
 				<input
 					className='setWidth addPadding'
 					placeholder='Assignee'
