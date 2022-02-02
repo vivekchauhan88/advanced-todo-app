@@ -208,25 +208,31 @@ function App() {
 			<br />
 			<div className='innerContainer'>
 				<TaskContainer
+					tasks={tasks}
 					heading='TO DO'
 					array={todo}
 					column='todo'
 					fillEditModal={fillEditModal}
 					removeTask={removeTask}
+					segregateTasks={segregateTasks}
 				/>
 				<TaskContainer
+					tasks={tasks}
 					heading='IN PROGRESS'
 					array={inProgress}
 					column='inProgress'
 					fillEditModal={fillEditModal}
 					removeTask={removeTask}
+					segregateTasks={segregateTasks}
 				/>
 				<TaskContainer
+					tasks={tasks}
 					heading='COMPLETE'
 					array={complete}
 					column='complete'
 					fillEditModal={fillEditModal}
 					removeTask={removeTask}
+					segregateTasks={segregateTasks}
 				/>
 			</div>
 			<Modal
